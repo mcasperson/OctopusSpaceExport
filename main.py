@@ -33,7 +33,7 @@ parser.add_argument('--excludedProjects',
                     dest='excluded_projects',
                     action='store',
                     help='Projects to exclude from the export',
-                    required=True)
+                    required=False)
 
 args = parser.parse_args()
 
@@ -111,7 +111,7 @@ def create_export(space_id, projects):
 
     url = args.octopus_url + "/api/" + space_id + "/projects/import-export/export"
 
-    excluded_projects = args.excluded_projects.split(",")
+    excluded_projects = args.excluded_projects.split(",") if args.excluded_projects else []
     filtered_items = [a for a in projects if not a in excluded_projects]
 
     quoted_list = list(map(lambda p: '"' + p + '"', filtered_items))
