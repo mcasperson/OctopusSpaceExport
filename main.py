@@ -1,4 +1,5 @@
 import argparse
+import signal
 import sys
 import time
 import urllib
@@ -38,6 +39,15 @@ parser.add_argument('--excludedProjects',
 args = parser.parse_args()
 
 headers = {"X-Octopus-ApiKey": args.octopus_api_key}
+
+cancelled = False
+
+
+def handler(signum, frame):
+    cancelled = True
+
+
+signal.signal(signal.SIGINT, handler)
 
 
 @retry(stop_max_attempt_number=3, wait_fixed=2000)
@@ -139,7 +149,7 @@ def download_artifacts(space_id, task_id):
             open(artifact['Filename'], 'wb').write(response.content)
             print("Saved " + artifact['Filename'])
 
-        if len(artifacts["Items"]) != 0:
+        if len(artifacts["Items"]) != 0 or cancelled:
             break
 
         # try to download the artifacts again
