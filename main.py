@@ -132,7 +132,7 @@ def download_artifacts(space_id, task_id):
             open(artifact['Filename'], 'wb').write(response.content)
             print("Saved " + artifact['Filename'])
 
-        if len(artifacts) != 0:
+        if len(artifacts["Items"]) != 0:
             break
 
         # try to download the artifacts again
