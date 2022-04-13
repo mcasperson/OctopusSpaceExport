@@ -29,6 +29,11 @@ parser.add_argument('--exportPassword',
                     action='store',
                     help='The exported archive password',
                     required=True)
+parser.add_argument('--excludedProjects',
+                    dest='excluded_projects',
+                    action='store',
+                    help='Projects to exclude from the export',
+                    required=True)
 
 args = parser.parse_args()
 
@@ -105,9 +110,11 @@ def create_export(space_id, projects):
         return None
 
     url = args.octopus_url + "/api/" + space_id + "/projects/import-export/export"
-    print(url)
 
-    quoted_list = list(map(lambda p: '"' + p + '"', projects))
+    excluded_projects = args.excluded_projects.split(",")
+    filtered_items = [a for a in projects if not a in excluded_projects]
+
+    quoted_list = list(map(lambda p: '"' + p + '"', filtered_items))
 
     response = post(url, '{"IncludedProjectIds":[' + ','.join(
         quoted_list) + '],"Password":{"HasValue":true,"NewValue":"' + args.export_password + '"}}', headers=headers)
