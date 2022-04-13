@@ -118,31 +118,6 @@ jobs:
         asset_path: OctopusSpaceExport.${{ steps.determine_version.outputs.semVer }}.zip
         asset_name: OctopusSpaceExport.${{ steps.determine_version.outputs.semVer }}.zip
         asset_content_type: application/octet-stream
-    - name: Push to Octopus
-      uses: OctopusDeploy/push-package-action@v1.1.1
-      with:
-        api_key: ${{ secrets.OCTOPUS_API_TOKEN }}
-        packages: OctopusSpaceExport.${{ steps.determine_version.outputs.semVer }}.zip
-        server: ${{ secrets.OCTOPUS_SERVER_URL }}
-        overwrite_mode: OverwriteExisting
-    - name: Generate Octopus Deploy build information
-      uses: xo-energy/action-octopus-build-information@v1.1.2
-      with:
-        octopus_api_key: ${{ secrets.OCTOPUS_API_TOKEN }}
-        octopus_project: OctopusSpaceExport
-        octopus_server: ${{ secrets.OCTOPUS_SERVER_URL }}
-        push_version: ${{ steps.determine_version.outputs.semVer }}
-        push_package_ids: OctopusSpaceExport
-        push_overwrite_mode: OverwriteExisting
-        output_path: octopus
-    - name: Create Octopus Release
-      uses: OctopusDeploy/create-release-action@v1.1.1
-      with:
-        api_key: ${{ secrets.OCTOPUS_API_TOKEN }}
-        project: OctopusSpaceExport
-        server: ${{ secrets.OCTOPUS_SERVER_URL }}
-        deploy_to: Development
-        packages: OctopusSpaceExport:${{ steps.determine_version.outputs.semVer }}
 name: Python Build
 'on':
   workflow_dispatch: {}
