@@ -118,17 +118,25 @@ def create_export(space_id, projects):
 
 
 def download_artifacts(space_id, task_id):
-    # Get the artifacts
-    uri = args.octopus_url + "/api/" + space_id + "/artifacts?regarding=" + task_id
-    artifacts = get(uri, headers=headers).json()
+    # Loop for 5 minutes or until the artifacts ar available
+    for x in range(300):
+        # Get the artifacts
+        uri = args.octopus_url + "/api/" + space_id + "/artifacts?regarding=" + task_id
+        artifacts = get(uri, headers=headers).json()
 
-    # Download the artifacts
-    for artifact in artifacts["Items"]:
-        uri = args.octopus_url + "/api/" + space_id + "/artifacts/" + artifact["Id"] + "/content"
-        response = get(uri, allow_redirects=True, headers=headers)
-        response.raise_for_status()
-        open(artifact['Filename'], 'wb').write(response.content)
-        print("Saved " + artifact['Filename'])
+        # Download the artifacts
+        for artifact in artifacts["Items"]:
+            uri = args.octopus_url + "/api/" + space_id + "/artifacts/" + artifact["Id"] + "/content"
+            response = get(uri, allow_redirects=True, headers=headers)
+            response.raise_for_status()
+            open(artifact['Filename'], 'wb').write(response.content)
+            print("Saved " + artifact['Filename'])
+
+        if len(artifact) != 0:
+            break
+
+        # try to download the artifacts again
+        time.sleep(10)
 
 
 space_id = get_space_id(args.octopus_space)
