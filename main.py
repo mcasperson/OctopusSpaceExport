@@ -136,11 +136,11 @@ def download_artifacts(space_id, task_id):
             break
 
         # try to download the artifacts again
+        print("No artifacts found - sleeping for 10 seconds before trying again")
         time.sleep(10)
 
 
 space_id = get_space_id(args.octopus_space)
 projects = get_projects(space_id)
 task_id = create_export(space_id, projects)
-time.sleep(60)
 download_artifacts(space_id, task_id)
