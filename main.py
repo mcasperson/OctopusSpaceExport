@@ -136,7 +136,7 @@ def create_export(space_id, projects):
 
 def download_artifacts(space_id, task_id):
     # Loop for 5 minutes or until the artifacts ar available
-    for x in range(300):
+    for x in range(30):
         # Get the artifacts
         uri = args.octopus_url + "/api/" + space_id + "/artifacts?regarding=" + task_id
         artifacts = get(uri, headers=headers).json()
