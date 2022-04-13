@@ -1,5 +1,6 @@
 import argparse
 import sys
+import time
 import urllib
 
 from requests import get
@@ -107,13 +108,31 @@ def create_export(space_id, projects):
     print(url)
 
     quoted_list = list(map(lambda p: '"' + p + '"', projects))
-    print(','.join(quoted_list))
 
-    response = post(url, '{"IncludedProjectIds":[' + ','.join(quoted_list) + '],"Password":{"HasValue":true,"NewValue":"' + args.export_password + '"}}', headers=headers)
+    response = post(url, '{"IncludedProjectIds":[' + ','.join(
+        quoted_list) + '],"Password":{"HasValue":true,"NewValue":"' + args.export_password + '"}}', headers=headers)
 
     print(response.text)
+
+    return response.json()["TaskId"]
+
+
+def download_artifacts(space_id, task_id):
+    # Get the artifacts
+    uri = args.octopus_url + "/api/" + space_id + "/artifacts?regarding=" + task_id
+    artifacts = get(uri, headers=headers).json()
+
+    # Download the artifacts
+    for artifact in artifacts["Items"]:
+        uri = args.octopus_url + "/api/" + space_id + "/artifacts/" + artifact["Id"] + "/content"
+        response = get(uri, allow_redirects=True, headers=headers)
+        response.raise_for_status()
+        open(artifact['Filename'], 'wb').write(response.content)
+        print("Saved " + artifact['Filename'])
 
 
 space_id = get_space_id(args.octopus_space)
 projects = get_projects(space_id)
-create_export(space_id, projects)
+task_id = create_export(space_id, projects)
+time.sleep(60)
+download_artifacts(space_id, task_id)
