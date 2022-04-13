@@ -44,7 +44,9 @@ cancelled = False
 
 
 def handler(signum, frame):
+    global cancelled
     cancelled = True
+    print("loop was cancelled")
 
 
 signal.signal(signal.SIGINT, handler)
